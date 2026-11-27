@@ -22,8 +22,7 @@ export function createLogTailer(
   pollIntervalMs = 500,
 ): LogTailerHandle {
   const config: AppConfig = { ...getAppConfig(), ...overrideConfig };
-  const targetPath =
-    config.logSource === "sample" ? config.sampleLogPath : config.logPath;
+  const targetPath = config.logPath;
 
   let stopped = false;
   let offset = 0;

@@ -9,20 +9,21 @@ A lightweight, read-only Next.js (App Router) web application for inspecting Pos
 - **Dashboard (`/`)**: Total/Delivered/Deferred/Bounced/Rejected cards, 24-hour Recharts volume breakdown, top bounce/deferral/rejection reasons, and top recipient domains.
 - **Searchable Messages (`/messages`)**: Debounced search, status/date filtering, pagination, and a live **Auto-refresh** toggle powered by Server-Sent Events (`/api/stream`) with rotation handling.
 - **Message Detail (`/messages/[queueId]`)**: Chronological event timeline, delivery attempts table, and collapsible raw syslog viewer with copy button.
-- **Local Sample Mode**: `MAIL_LOG_SOURCE=sample` reads from `./sample-data/mail.log` for local development.
+- **Live SSE Tailer**: Real-time `/api/stream` endpoint using `fs.watch` + polling fallback with byte-offset and inode tracking across log rotations.
 - **Optional `journald` Adapter**: `MAIL_LOG_SOURCE=journald` reads logs via `journalctl -u postfix -o short-iso` using a fixed argument list (`execFile`, no shell).
 
 ---
 
-## Local Development (Sample Mode)
+## Local Development
+
+Point `MAIL_LOG_PATH` in `.env.local` to a local Postfix log file copy:
 
 ```bash
 cp .env.example .env.local
+# Edit .env.local to set MAIL_LOG_PATH=/path/to/your/mail.log
 npm install
 npm run dev
 ```
-
-Open `http://localhost:3000`. By default `.env.example` sets `MAIL_LOG_SOURCE=sample`, which reads from `./sample-data/mail.log`.
 
 Run tests and checks:
 

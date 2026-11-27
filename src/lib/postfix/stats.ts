@@ -50,7 +50,6 @@ export function computeMailStats(
 ): MailStats {
   const config = getAppConfig();
   const timezone = options.timezone ?? config.timezone;
-  const logSource = options.logSource ?? config.logSource;
   const nowDate = options.now ?? new Date();
 
   let delivered = 0;
@@ -117,18 +116,8 @@ export function computeMailStats(
     }
   }
 
-  let windowEndMs = nowDate.getTime();
+  const windowEndMs = nowDate.getTime();
   const hourMs = 60 * 60 * 1000;
-  const window24hMs = 24 * hourMs;
-  if (
-    logSource === "sample" &&
-    messages.length > 0 &&
-    !messages.some(
-      (m) => m.lastTimestampMs >= windowEndMs - window24hMs && m.lastTimestampMs <= windowEndMs,
-    )
-  ) {
-    windowEndMs = Math.max(...messages.map((m) => m.lastTimestampMs));
-  }
 
   const endHourStartMs = Math.floor(windowEndMs / hourMs) * hourMs;
   const startHourMs = endHourStartMs - 23 * hourMs;

@@ -1,11 +1,8 @@
-import path from "node:path";
-
-export type LogSourceMode = "file" | "sample" | "journald";
+export type LogSourceMode = "file" | "journald";
 
 export interface AppConfig {
   logSource: LogSourceMode;
   logPath: string;
-  sampleLogPath: string;
   includeRotated: boolean;
   journaldMaxLines: number;
   timezone: string;
@@ -15,14 +12,10 @@ const DEFAULT_LOG_PATH = "/var/log/mail.log";
 const DEFAULT_MAX_JOURNAL_LINES = 5000;
 
 export function getAppConfig(): AppConfig {
-  const rawSource = (process.env.MAIL_LOG_SOURCE ?? "sample").trim().toLowerCase();
-  let logSource: LogSourceMode = "sample";
-  if (rawSource === "file" || rawSource === "sample" || rawSource === "journald") {
-    logSource = rawSource;
-  }
+  const rawSource = (process.env.MAIL_LOG_SOURCE ?? "file").trim().toLowerCase();
+  const logSource: LogSourceMode = rawSource === "journald" ? "journald" : "file";
 
   const logPath = process.env.MAIL_LOG_PATH?.trim() || DEFAULT_LOG_PATH;
-  const sampleLogPath = path.resolve(process.cwd(), "sample-data", "mail.log");
 
   const includeRotated =
     (process.env.MAIL_LOG_INCLUDE_ROTATED ?? "true").trim().toLowerCase() !== "false";
@@ -38,7 +31,6 @@ export function getAppConfig(): AppConfig {
   return {
     logSource,
     logPath,
-    sampleLogPath,
     includeRotated,
     journaldMaxLines,
     timezone,

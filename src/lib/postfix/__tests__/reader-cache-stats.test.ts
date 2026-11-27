@@ -24,12 +24,33 @@ afterEach(async () => {
   }
 });
 
-describe("sample-data/mail.log integration", () => {
-  it("reads at least 200 lines and produces all expected statuses and stats", async () => {
+describe("log file parsing, filtering, and stats integration", () => {
+  it("parses log lines into all expected statuses and computes 24h stats", async () => {
+    const dir = await makeTempDir();
+    const logFile = path.join(dir, "mail.log");
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const ts = `${months[now.getUTCMonth()]} ${String(now.getUTCDate()).padStart(2, " ")} ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:00`;
+
+    await fs.writeFile(
+      logFile,
+      [
+        `${ts} mail postfix/qmgr[1]: 4F3A001001A: from=<a@example.com>, size=1024, nrcpt=1 (queue active)`,
+        `${ts} mail postfix/smtp[2]: 4F3A001001A: to=<u1@gmail.com>, relay=mx.google.com[1.2.3.4]:25, delay=0.9, delays=0.1/0/0.3/0.5, dsn=2.0.0, status=sent (250 OK)`,
+        `${ts} mail postfix/qmgr[1]: 4F3A001002B: from=<b@example.com>, size=512, nrcpt=1 (queue active)`,
+        `${ts} mail postfix/smtp[3]: 4F3A001002B: to=<u2@yahoo.com>, relay=mx.yahoo.com[2.3.4.5]:25, delay=1.4, delays=0.1/0/0.5/0.8, dsn=4.7.1, status=deferred (451 4.7.1 Greylisted)`,
+        `${ts} mail postfix/qmgr[1]: 4F3A001003C: from=<c@example.com>, size=512, nrcpt=1 (queue active)`,
+        `${ts} mail postfix/smtp[4]: 4F3A001003C: to=<u3@outlook.com>, relay=mx.outlook.com[3.4.5.6]:25, delay=0.8, delays=0.1/0/0.3/0.4, dsn=5.1.1, status=bounced (550 5.1.1 User unknown)`,
+        `${ts} mail postfix/qmgr[1]: 4F3A001004D: from=<d@example.com>, size=256, nrcpt=1 (queue active)`,
+        `${ts} mail postfix/smtpd[5]: NOQUEUE: reject: RCPT from unknown[185.220.101.45]: 554 5.7.1 Service unavailable; Client host [185.220.101.45] blocked using zen.spamhaus.org; from=<spam@evil.biz> to=<admin@example.com> proto=ESMTP`,
+      ].join("\n"),
+      "utf8",
+    );
+
     const config: AppConfig = {
-      logSource: "sample",
-      logPath: "/var/log/mail.log",
-      sampleLogPath: path.resolve(process.cwd(), "sample-data", "mail.log"),
+      logSource: "file",
+      logPath: logFile,
       includeRotated: false,
       journaldMaxLines: 5000,
       timezone: "UTC",
@@ -37,35 +58,33 @@ describe("sample-data/mail.log integration", () => {
 
     const { result, cacheHit } = await getParsedLogs(config);
     expect(cacheHit).toBe(false);
-    expect(result.totalLines).toBeGreaterThanOrEqual(200);
+    expect(result.totalLines).toBe(8);
 
-    // Second read hits cache
     const second = await getParsedLogs(config);
     expect(second.cacheHit).toBe(true);
 
-    const stats = computeMailStats(result.messages);
-    expect(stats.counts.delivered).toBeGreaterThan(0);
-    expect(stats.counts.deferred).toBeGreaterThan(0);
-    expect(stats.counts.bounced).toBeGreaterThan(0);
-    expect(stats.counts.rejected).toBeGreaterThan(0);
-    expect(stats.counts.inQueue).toBeGreaterThan(0);
+    const stats = computeMailStats(result.messages, { timezone: "UTC", now });
+    expect(stats.counts.delivered).toBe(1);
+    expect(stats.counts.deferred).toBe(1);
+    expect(stats.counts.bounced).toBe(1);
+    expect(stats.counts.rejected).toBe(1);
+    expect(stats.counts.inQueue).toBe(1);
     expect(stats.hourly).toHaveLength(24);
     expect(stats.topRecipientDomains.length).toBeGreaterThan(0);
     expect(stats.topReasons.length).toBeGreaterThan(0);
 
-    // Filtering & pagination
     const bouncedOnly = filterAndPaginateMessages(result.messages, {
       status: "bounced",
       page: 1,
       pageSize: 10,
     });
     expect(bouncedOnly.items.every((m) => m.status === "bounced")).toBe(true);
-    expect(bouncedOnly.total).toBe(stats.counts.bounced);
+    expect(bouncedOnly.total).toBe(1);
 
     const spamhausSearch = filterAndPaginateMessages(result.messages, {
       q: "spamhaus",
     });
-    expect(spamhausSearch.total).toBeGreaterThan(0);
+    expect(spamhausSearch.total).toBe(1);
   });
 });
 
@@ -92,7 +111,6 @@ describe("rotated & gzipped log reading + cache invalidation", () => {
     const config: AppConfig = {
       logSource: "file",
       logPath: active,
-      sampleLogPath: active,
       includeRotated: true,
       journaldMaxLines: 5000,
       timezone: "UTC",
@@ -136,7 +154,6 @@ describe("createLogTailer", () => {
     const config: AppConfig = {
       logSource: "file",
       logPath: logFile,
-      sampleLogPath: logFile,
       includeRotated: false,
       journaldMaxLines: 5000,
       timezone: "UTC",

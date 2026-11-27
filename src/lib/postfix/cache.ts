@@ -36,8 +36,7 @@ function fingerprintsMatch(a: FileFingerprint[], b: FileFingerprint[]): boolean 
 }
 
 function buildConfigKey(config: AppConfig): string {
-  const target = config.logSource === "sample" ? config.sampleLogPath : config.logPath;
-  return `${config.logSource}|${target}|${config.includeRotated}|${config.timezone}|${config.journaldMaxLines}`;
+  return `${config.logSource}|${config.logPath}|${config.includeRotated}|${config.timezone}|${config.journaldMaxLines}`;
 }
 
 export interface ParsedLogsSnapshot {
@@ -68,11 +67,10 @@ export async function getParsedLogs(
         };
       }
     } else {
-      const targetPath =
-        config.logSource === "sample" ? config.sampleLogPath : config.logPath;
-      const includeRotated =
-        config.logSource === "sample" ? false : config.includeRotated;
-      const candidateFiles = await resolveLogFiles(targetPath, includeRotated);
+      const candidateFiles = await resolveLogFiles(
+        config.logPath,
+        config.includeRotated,
+      );
       const currentFps = await statLogFiles(candidateFiles);
       if (fingerprintsMatch(cachedEntry.files, currentFps)) {
         return {

@@ -105,17 +105,12 @@ export async function readConfiguredLogs(
     };
   }
 
-  const targetPath =
-    config.logSource === "sample" ? config.sampleLogPath : config.logPath;
-  const includeRotated =
-    config.logSource === "sample" ? false : config.includeRotated;
-
-  const candidateFiles = await resolveLogFiles(targetPath, includeRotated);
+  const candidateFiles = await resolveLogFiles(config.logPath, config.includeRotated);
   const files = await statLogFiles(candidateFiles);
 
   if (files.length === 0) {
     throw new Error(
-      `Configured mail log file not found or unreadable: ${targetPath}`,
+      `Configured mail log file not found or unreadable: ${config.logPath}`,
     );
   }
 

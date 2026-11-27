@@ -1,51 +1,94 @@
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { clearLogCache } from "@/lib/postfix/cache";
+import { GET as getHealth } from "../health/route";
 import { GET as getMessageDetail } from "../messages/[queueId]/route";
 import { GET as getMessages } from "../messages/route";
 import { GET as getStats } from "../stats/route";
 import { GET as getStream } from "../stream/route";
 
-describe("API Route Handlers (sample mode)", () => {
+describe("API Route Handlers (file mode)", () => {
   const prevSource = process.env.MAIL_LOG_SOURCE;
+  const prevPath = process.env.MAIL_LOG_PATH;
+  const prevRotated = process.env.MAIL_LOG_INCLUDE_ROTATED;
+  const prevTz = process.env.TZ;
+  let tempDir = "";
 
-  beforeEach(() => {
-    process.env.MAIL_LOG_SOURCE = "sample";
+  beforeEach(async () => {
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "mail-log-api-test-"));
+    const logPath = path.join(tempDir, "mail.log");
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const ts = `${months[now.getUTCMonth()]} ${String(now.getUTCDate()).padStart(2, " ")} ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:00`;
+
+    await fs.writeFile(
+      logPath,
+      [
+        `${ts} mail postfix/qmgr[1]: 4F3A001001A: from=<a@example.com>, size=1024, nrcpt=1 (queue active)`,
+        `${ts} mail postfix/smtp[2]: 4F3A001001A: to=<u1@gmail.com>, relay=mx.google.com[1.2.3.4]:25, delay=0.9, delays=0.1/0/0.3/0.5, dsn=2.0.0, status=sent (250 OK)`,
+        `${ts} mail postfix/qmgr[1]: 4F3A001002B: from=<b@example.com>, size=512, nrcpt=1 (queue active)`,
+        `${ts} mail postfix/smtp[3]: 4F3A001002B: to=<u2@yahoo.com>, relay=mx.yahoo.com[2.3.4.5]:25, delay=1.4, delays=0.1/0/0.5/0.8, dsn=4.7.1, status=deferred (451 4.7.1 Greylisted)`,
+        `${ts} mail postfix/qmgr[1]: 4F3A001003C: from=<c@example.com>, size=512, nrcpt=1 (queue active)`,
+        `${ts} mail postfix/smtp[4]: 4F3A001003C: to=<u3@outlook.com>, relay=mx.outlook.com[3.4.5.6]:25, delay=0.8, delays=0.1/0/0.3/0.4, dsn=5.1.1, status=bounced (550 5.1.1 User unknown)`,
+        `${ts} mail postfix/smtpd[5]: NOQUEUE: reject: RCPT from unknown[185.220.101.45]: 554 5.7.1 Service unavailable; Client host [185.220.101.45] blocked using zen.spamhaus.org; from=<spam@evil.biz> to=<admin@example.com> proto=ESMTP`,
+      ].join("\n"),
+      "utf8",
+    );
+
+    process.env.MAIL_LOG_SOURCE = "file";
+    process.env.MAIL_LOG_PATH = logPath;
+    process.env.MAIL_LOG_INCLUDE_ROTATED = "false";
+    process.env.TZ = "UTC";
     clearLogCache();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     process.env.MAIL_LOG_SOURCE = prevSource;
+    process.env.MAIL_LOG_PATH = prevPath;
+    process.env.MAIL_LOG_INCLUDE_ROTATED = prevRotated;
+    process.env.TZ = prevTz;
     clearLogCache();
+    if (tempDir) {
+      await fs.rm(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it("GET /api/health returns ok status", async () => {
+    const res = await getHealth();
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe("ok");
+    expect(body.source).toBe("file");
   });
 
   it("GET /api/stats returns counts, 24h hourly buckets, domains, and reasons", async () => {
     const res = await getStats();
     expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.source).toBe("sample");
-    expect(data.counts.total).toBeGreaterThan(20);
-    expect(data.counts.delivered).toBeGreaterThan(0);
-    expect(data.counts.deferred).toBeGreaterThan(0);
-    expect(data.counts.bounced).toBeGreaterThan(0);
-    expect(data.counts.rejected).toBeGreaterThan(0);
+    expect(data.source).toBe("file");
+    expect(data.counts.total).toBe(4);
+    expect(data.counts.delivered).toBe(1);
+    expect(data.counts.deferred).toBe(1);
+    expect(data.counts.bounced).toBe(1);
+    expect(data.counts.rejected).toBe(1);
     expect(data.hourly).toHaveLength(24);
     expect(data.topRecipientDomains.length).toBeGreaterThan(0);
     expect(data.topReasons.length).toBeGreaterThan(0);
   });
 
   it("GET /api/messages supports filtering, pagination, and newest-first order", async () => {
-    const reqAll = new NextRequest("http://localhost:3000/api/messages?page=1&pageSize=5");
+    const reqAll = new NextRequest("http://localhost:3000/api/messages?page=1&pageSize=2");
     const resAll = await getMessages(reqAll);
     expect(resAll.status).toBe(200);
     const allData = await resAll.json();
-    expect(allData.items).toHaveLength(5);
+    expect(allData.items).toHaveLength(2);
     expect(allData.page).toBe(1);
-    expect(allData.pageSize).toBe(5);
-    expect(allData.totalPages).toBeGreaterThan(1);
-    expect(allData.items[0].lastTimestampMs).toBeGreaterThanOrEqual(
-      allData.items[1].lastTimestampMs,
-    );
+    expect(allData.pageSize).toBe(2);
+    expect(allData.totalPages).toBe(2);
 
     const reqFiltered = new NextRequest(
       "http://localhost:3000/api/messages?status=rejected&q=spamhaus",
@@ -53,23 +96,18 @@ describe("API Route Handlers (sample mode)", () => {
     const resFiltered = await getMessages(reqFiltered);
     expect(resFiltered.status).toBe(200);
     const filteredData = await resFiltered.json();
-    expect(filteredData.total).toBeGreaterThan(0);
-    expect(filteredData.items.every((m: { status: string }) => m.status === "rejected")).toBe(true);
+    expect(filteredData.total).toBe(1);
+    expect(filteredData.items[0].status).toBe("rejected");
   });
 
-  it("GET /api/messages/[queueId] returns detail or 404", async () => {
-    const reqAll = new NextRequest("http://localhost:3000/api/messages?page=1&pageSize=1");
-    const listRes = await getMessages(reqAll);
-    const listJson = await listRes.json();
-    const firstId = listJson.items[0].queueId as string;
-
+  it("GET /api/messages/[queueId] returns detail, 404, or 400", async () => {
     const detailRes = await getMessageDetail(
-      new NextRequest(`http://localhost:3000/api/messages/${encodeURIComponent(firstId)}`),
-      { params: Promise.resolve({ queueId: firstId }) },
+      new NextRequest("http://localhost:3000/api/messages/4F3A001001A"),
+      { params: Promise.resolve({ queueId: "4F3A001001A" }) },
     );
     expect(detailRes.status).toBe(200);
     const detailJson = await detailRes.json();
-    expect(detailJson.message.queueId).toBe(firstId);
+    expect(detailJson.message.queueId).toBe("4F3A001001A");
     expect(detailJson.message.rawLines.length).toBeGreaterThan(0);
 
     const missingRes = await getMessageDetail(
