@@ -1,0 +1,308 @@
+Nov 27 00:12:04 mail-qa postfix/smtpd[10412]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 00:12:04 mail-qa postfix/smtpd[10412]: Anonymous TLS connection established from app-worker-01.internal[10.0.1.15]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits) key-exchange X25519 server-signature RSA-PSS (2048 bits)
+Nov 27 00:12:04 mail-qa postfix/smtpd[10412]: 4F3A001001A: client=app-worker-01.internal[10.0.1.15]
+Nov 27 00:12:04 mail-qa postfix/cleanup[10415]: 4F3A001001A: message-id=<qa-nightly-001@qa.example.com>
+Nov 27 00:12:04 mail-qa postfix/qmgr[812]: 4F3A001001A: from=<noreply@qa.example.com>, size=2480, nrcpt=1 (queue active)
+Nov 27 00:12:05 mail-qa postfix/smtp[10418]: Trusted TLS connection established to gmail-smtp-in.l.google.com[142.250.102.27]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 00:12:05 mail-qa postfix/smtp[10418]: 4F3A001001A: to=<alice.tester@gmail.com>, relay=gmail-smtp-in.l.google.com[142.250.102.27]:25, delay=1.2, delays=0.08/0.02/0.45/0.65, dsn=2.0.0, status=sent (250 2.0.0 OK  1732666325 a12-20020a05600c)
+Nov 27 00:12:05 mail-qa postfix/qmgr[812]: 4F3A001001A: removed
+Nov 27 00:12:06 mail-qa postfix/smtpd[10412]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=2 starttls=1 mail=1 rcpt=1 data=1 quit=1 commands=7
+Nov 27 01:05:18 mail-qa postfix/smtpd[10501]: connect from unknown[185.220.101.45]
+Nov 27 01:05:19 mail-qa postfix/smtpd[10501]: NOQUEUE: reject: RCPT from unknown[185.220.101.45]: 554 5.7.1 Service unavailable; Client host [185.220.101.45] blocked using zen.spamhaus.org; from=<promo@spam-sender.biz> to=<qa-inbox@qa.example.com> proto=ESMTP helo=<mail.spam-sender.biz>
+Nov 27 01:05:19 mail-qa postfix/smtpd[10501]: disconnect from unknown[185.220.101.45] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
+Nov 27 01:34:41 mail-qa postfix/smtpd[10540]: connect from app-worker-02.internal[10.0.1.16]
+Nov 27 01:34:41 mail-qa postfix/smtpd[10540]: 4F3A002002B: client=app-worker-02.internal[10.0.1.16]
+Nov 27 01:34:41 mail-qa postfix/cleanup[10543]: 4F3A002002B: message-id=<qa-signup-002@qa.example.com>
+Nov 27 01:34:41 mail-qa postfix/qmgr[812]: 4F3A002002B: from=<auth@qa.example.com>, size=4120, nrcpt=2 (queue active)
+Nov 27 01:34:42 mail-qa postfix/smtp[10546]: Trusted TLS connection established to outlook-com.olc.protection.outlook.com[52.101.68.12]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 01:34:42 mail-qa postfix/smtp[10546]: 4F3A002002B: to=<bob.qa@outlook.com>, relay=outlook-com.olc.protection.outlook.com[52.101.68.12]:25, delay=1.4, delays=0.05/0.01/0.52/0.82, dsn=2.0.0, status=sent (250 2.6.0 <qa-signup-002@qa.example.com> Queued mail for delivery)
+Nov 27 01:34:43 mail-qa postfix/smtp[10547]: 4F3A002002B: to=<audit-copy@corp-archive.example>, relay=mx.corp-archive.example[198.51.100.24]:25, delay=2.1, delays=0.05/0.01/0.64/1.4, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 9912AB)
+Nov 27 01:34:43 mail-qa postfix/qmgr[812]: 4F3A002002B: removed
+Nov 27 01:34:44 mail-qa postfix/smtpd[10540]: disconnect from app-worker-02.internal[10.0.1.16] ehlo=1 mail=1 rcpt=2 data=1 quit=1 commands=6
+Nov 27 02:18:10 mail-qa postfix/smtpd[10602]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 02:18:10 mail-qa postfix/smtpd[10602]: 4F3A003003C: client=app-worker-01.internal[10.0.1.15]
+Nov 27 02:18:10 mail-qa postfix/cleanup[10605]: 4F3A003003C: message-id=<qa-invoice-003@qa.example.com>
+Nov 27 02:18:10 mail-qa postfix/qmgr[812]: 4F3A003003C: from=<billing@qa.example.com>, size=18940, nrcpt=1 (queue active)
+Nov 27 02:18:11 mail-qa postfix/smtp[10608]: 4F3A003003C: to=<nonexistent.user.999@gmail.com>, relay=gmail-smtp-in.l.google.com[142.250.102.27]:25, delay=0.95, delays=0.04/0.01/0.35/0.55, dsn=5.1.1, status=bounced (host gmail-smtp-in.l.google.com[142.250.102.27] said: 550-5.1.1 The email account that you tried to reach does not exist. Please try double-checking the recipient's email address for typos. (in reply to RCPT TO command))
+Nov 27 02:18:11 mail-qa postfix/cleanup[10605]: 4F3A003004D: message-id=<20261127021811.4F3A003004D@mail-qa.qa.example.com>
+Nov 27 02:18:11 mail-qa postfix/bounce[10610]: 4F3A003003C: sender non-delivery notification: 4F3A003004D
+Nov 27 02:18:11 mail-qa postfix/qmgr[812]: 4F3A003004D: from=<>, size=21420, nrcpt=1 (queue active)
+Nov 27 02:18:11 mail-qa postfix/qmgr[812]: 4F3A003003C: removed
+Nov 27 02:18:12 mail-qa postfix/local[10612]: 4F3A003004D: to=<billing@qa.example.com>, relay=local, delay=0.12, delays=0.02/0.01/0/0.09, dsn=2.0.0, status=sent (delivered to maildir)
+Nov 27 02:18:12 mail-qa postfix/qmgr[812]: 4F3A003004D: removed
+Nov 27 02:18:12 mail-qa postfix/smtpd[10602]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 03:10:02 mail-qa postfix/smtpd[10690]: connect from app-worker-02.internal[10.0.1.16]
+Nov 27 03:10:02 mail-qa postfix/smtpd[10690]: 4F3A004005E: client=app-worker-02.internal[10.0.1.16]
+Nov 27 03:10:02 mail-qa postfix/cleanup[10692]: 4F3A004005E: message-id=<qa-alert-004@qa.example.com>
+Nov 27 03:10:02 mail-qa postfix/qmgr[812]: 4F3A004005E: from=<alerts@qa.example.com>, size=1540, nrcpt=1 (queue active)
+Nov 27 03:10:32 mail-qa postfix/smtp[10695]: connect to mx1.slow-partner.example[203.0.113.77]:25: Connection timed out
+Nov 27 03:10:32 mail-qa postfix/smtp[10695]: 4F3A004005E: to=<ops@slow-partner.example>, relay=none, delay=30.1, delays=0.04/0.01/30.05/0, dsn=4.4.1, status=deferred (connect to mx1.slow-partner.example[203.0.113.77]:25: Connection timed out)
+Nov 27 03:10:32 mail-qa postfix/smtpd[10690]: disconnect from app-worker-02.internal[10.0.1.16] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 03:45:15 mail-qa postfix/qmgr[812]: 4F3A004005E: from=<alerts@qa.example.com>, size=1540, nrcpt=1 (queue active)
+Nov 27 03:45:16 mail-qa postfix/smtp[10731]: Verified TLS connection established to mx2.slow-partner.example[203.0.113.78]:25: TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits)
+Nov 27 03:45:16 mail-qa postfix/smtp[10731]: 4F3A004005E: to=<ops@slow-partner.example>, relay=mx2.slow-partner.example[203.0.113.78]:25, delay=2114, delays=2113/0.02/0.41/0.57, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as B8120)
+Nov 27 03:45:16 mail-qa postfix/qmgr[812]: 4F3A004005E: removed
+Nov 27 04:11:29 mail-qa postfix/smtpd[10790]: connect from scanner-91.shodan.io[198.20.99.130]
+Nov 27 04:11:29 mail-qa postfix/smtpd[10790]: NOQUEUE: reject: RCPT from scanner-91.shodan.io[198.20.99.130]: 454 4.7.1 <external@target-domain.example>: Relay access denied; from=<probe@scanner.example> to=<external@target-domain.example> proto=ESMTP helo=<scanner-91>
+Nov 27 04:11:30 mail-qa postfix/smtpd[10790]: lost connection after RCPT from scanner-91.shodan.io[198.20.99.130]
+Nov 27 04:11:30 mail-qa postfix/smtpd[10790]: disconnect from scanner-91.shodan.io[198.20.99.130] ehlo=1 mail=1 rcpt=0/1 commands=2/3
+Nov 27 05:22:08 mail-qa postfix/smtpd[10850]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 05:22:08 mail-qa postfix/smtpd[10850]: Anonymous TLS connection established from app-worker-01.internal[10.0.1.15]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 05:22:08 mail-qa postfix/smtpd[10850]: 4F3A005006F: client=app-worker-01.internal[10.0.1.15]
+Nov 27 05:22:08 mail-qa postfix/cleanup[10853]: 4F3A005006F: message-id=<qa-reset-005@qa.example.com>
+Nov 27 05:22:08 mail-qa postfix/qmgr[812]: 4F3A005006F: from=<security@qa.example.com>, size=3180, nrcpt=1 (queue active)
+Nov 27 05:22:09 mail-qa postfix/smtp[10856]: Trusted TLS connection established to mx1.fastmail.example[66.111.4.72]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 05:22:09 mail-qa postfix/smtp[10856]: 4F3A005006F: to=<carol@fastmail.example>, relay=mx1.fastmail.example[66.111.4.72]:25, delay=1.1, delays=0.04/0.01/0.48/0.57, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as FM7721)
+Nov 27 05:22:09 mail-qa postfix/qmgr[812]: 4F3A005006F: removed
+Nov 27 05:22:09 mail-qa postfix/smtpd[10850]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=2 starttls=1 mail=1 rcpt=1 data=1 quit=1 commands=7
+Nov 27 06:04:19 mail-qa postfix/smtpd[10912]: connect from app-worker-03.internal[10.0.1.17]
+Nov 27 06:04:19 mail-qa postfix/smtpd[10912]: 4F3A006007A: client=app-worker-03.internal[10.0.1.17]
+Nov 27 06:04:19 mail-qa postfix/cleanup[10914]: 4F3A006007A: message-id=<qa-digest-006@qa.example.com>
+Nov 27 06:04:19 mail-qa postfix/qmgr[812]: 4F3A006007A: from=<digest@qa.example.com>, size=54200, nrcpt=3 (queue active)
+Nov 27 06:04:20 mail-qa postfix/smtp[10917]: 4F3A006007A: to=<dev1@yahoo.com>, relay=mta5.am0.yahoodns.net[67.195.204.73]:25, delay=1.3, delays=0.07/0.01/0.51/0.71, dsn=2.0.0, status=sent (250 ok dirdel)
+Nov 27 06:04:21 mail-qa postfix/smtp[10918]: 4F3A006007A: to=<dev2@proton.me>, relay=mail.protonmail.ch[185.70.42.128]:25, delay=1.8, delays=0.07/0.02/0.63/1.08, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as PM4401)
+Nov 27 06:04:21 mail-qa postfix/smtp[10919]: 4F3A006007A: to=<fullbox@small-isp.example>, relay=mx.small-isp.example[192.0.2.88]:25, delay=2.2, delays=0.07/0.02/0.49/1.62, dsn=5.2.2, status=bounced (host mx.small-isp.example[192.0.2.88] said: 552 5.2.2 Over quota (in reply to end of DATA command))
+Nov 27 06:04:21 mail-qa postfix/cleanup[10914]: 4F3A006008B: message-id=<20261127060421.4F3A006008B@mail-qa.qa.example.com>
+Nov 27 06:04:21 mail-qa postfix/bounce[10922]: 4F3A006007A: sender non-delivery notification: 4F3A006008B
+Nov 27 06:04:21 mail-qa postfix/qmgr[812]: 4F3A006008B: from=<>, size=56800, nrcpt=1 (queue active)
+Nov 27 06:04:21 mail-qa postfix/qmgr[812]: 4F3A006007A: removed
+Nov 27 06:04:22 mail-qa postfix/local[10924]: 4F3A006008B: to=<digest@qa.example.com>, relay=local, delay=0.09, delays=0.02/0.01/0/0.06, dsn=2.0.0, status=sent (delivered to maildir)
+Nov 27 06:04:22 mail-qa postfix/qmgr[812]: 4F3A006008B: removed
+Nov 27 06:04:22 mail-qa postfix/smtpd[10912]: disconnect from app-worker-03.internal[10.0.1.17] ehlo=1 mail=1 rcpt=3 data=1 quit=1 commands=7
+Nov 27 07:15:33 mail-qa postfix/smtpd[11005]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 07:15:33 mail-qa postfix/smtpd[11005]: 4F3A007009C: client=app-worker-01.internal[10.0.1.15]
+Nov 27 07:15:33 mail-qa postfix/cleanup[11008]: 4F3A007009C: message-id=<qa-greylist-007@qa.example.com>
+Nov 27 07:15:33 mail-qa postfix/qmgr[812]: 4F3A007009C: from=<mailer@qa.example.com>, size=2100, nrcpt=1 (queue active)
+Nov 27 07:15:34 mail-qa postfix/smtp[11011]: 4F3A007009C: to=<qa@greylist-vendor.example>, relay=mx.greylist-vendor.example[198.51.100.90]:25, delay=1.2, delays=0.05/0.01/0.44/0.7, dsn=4.7.1, status=deferred (host mx.greylist-vendor.example[198.51.100.90] said: 451 4.7.1 Greylisted, please try again in 300 seconds (in reply to RCPT TO command))
+Nov 27 07:15:34 mail-qa postfix/smtpd[11005]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 08:02:11 mail-qa postfix/smtpd[11101]: connect from unknown[91.240.118.22]
+Nov 27 08:02:12 mail-qa postfix/smtpd[11101]: NOQUEUE: reject: RCPT from unknown[91.240.118.22]: 554 5.7.1 Service unavailable; Client host [91.240.118.22] blocked using b.barracudacentral.org; from=<bot@bad-actor.ru> to=<admin@qa.example.com> proto=ESMTP helo=<win-srv01>
+Nov 27 08:02:12 mail-qa postfix/smtpd[11101]: disconnect from unknown[91.240.118.22] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
+Nov 27 08:30:45 mail-qa postfix/smtpd[11140]: connect from app-worker-02.internal[10.0.1.16]
+Nov 27 08:30:45 mail-qa postfix/smtpd[11140]: Anonymous TLS connection established from app-worker-02.internal[10.0.1.16]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 08:30:45 mail-qa postfix/smtpd[11140]: 4F3A008010D: client=app-worker-02.internal[10.0.1.16]
+Nov 27 08:30:45 mail-qa postfix/cleanup[11143]: 4F3A008010D: message-id=<qa-welcome-008@qa.example.com>
+Nov 27 08:30:45 mail-qa postfix/qmgr[812]: 4F3A008010D: from=<welcome@qa.example.com>, size=6420, nrcpt=1 (queue active)
+Nov 27 08:30:46 mail-qa postfix/smtp[11146]: Trusted TLS connection established to gmail-smtp-in.l.google.com[142.250.102.26]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 08:30:46 mail-qa postfix/smtp[11146]: 4F3A008010D: to=<dave.qa@gmail.com>, relay=gmail-smtp-in.l.google.com[142.250.102.26]:25, delay=0.88, delays=0.04/0.01/0.33/0.5, dsn=2.0.0, status=sent (250 2.0.0 OK  1732696246 d9-20020a05600c)
+Nov 27 08:30:46 mail-qa postfix/qmgr[812]: 4F3A008010D: removed
+Nov 27 08:30:46 mail-qa postfix/smtpd[11140]: disconnect from app-worker-02.internal[10.0.1.16] ehlo=2 starttls=1 mail=1 rcpt=1 data=1 quit=1 commands=7
+Nov 27 09:14:00 mail-qa postfix/smtpd[11210]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 09:14:00 mail-qa postfix/smtpd[11210]: 4F3A009011E: client=app-worker-01.internal[10.0.1.15]
+Nov 27 09:14:00 mail-qa postfix/cleanup[11212]: 4F3A009011E: message-id=<qa-otp-009@qa.example.com>
+Nov 27 09:14:00 mail-qa postfix/qmgr[812]: 4F3A009011E: from=<otp@qa.example.com>, size=1280, nrcpt=1 (queue active)
+Nov 27 09:14:01 mail-qa postfix/smtp[11215]: Trusted TLS connection established to mx.icloud.com[17.57.152.10]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 09:14:01 mail-qa postfix/smtp[11215]: 4F3A009011E: to=<eve.qa@icloud.com>, relay=mx.icloud.com[17.57.152.10]:25, delay=1.05, delays=0.03/0.01/0.45/0.56, dsn=2.0.0, status=sent (250 2.5.0 Ok, envelope id 0SML009011E)
+Nov 27 09:14:01 mail-qa postfix/qmgr[812]: 4F3A009011E: removed
+Nov 27 09:14:01 mail-qa postfix/smtpd[11210]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 09:50:12 mail-qa postfix/smtpd[11260]: connect from mail-relay.partner.example[203.0.113.40]
+Nov 27 09:50:12 mail-qa postfix/smtpd[11260]: NOQUEUE: reject: RCPT from mail-relay.partner.example[203.0.113.40]: 550 5.1.1 <ghost-user@qa.example.com>: Recipient address rejected: User unknown in virtual mailbox table; from=<support@partner.example> to=<ghost-user@qa.example.com> proto=ESMTP helo=<mail-relay.partner.example>
+Nov 27 09:50:12 mail-qa postfix/smtpd[11260]: disconnect from mail-relay.partner.example[203.0.113.40] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
+Nov 27 10:19:44 mail-qa postfix/smtpd[11300]: connect from app-worker-03.internal[10.0.1.17]
+Nov 27 10:19:44 mail-qa postfix/smtpd[11300]: 4F3A010012F: client=app-worker-03.internal[10.0.1.17]
+Nov 27 10:19:44 mail-qa postfix/cleanup[11302]: 4F3A010012F: message-id=<qa-receipt-010@qa.example.com>
+Nov 27 10:19:44 mail-qa postfix/qmgr[812]: 4F3A010012F: from=<billing@qa.example.com>, size=9840, nrcpt=1 (queue active)
+Nov 27 10:19:45 mail-qa postfix/smtp[11305]: 4F3A010012F: to=<frank@outlook.com>, relay=outlook-com.olc.protection.outlook.com[52.101.68.15]:25, delay=1.35, delays=0.04/0.01/0.55/0.75, dsn=2.0.0, status=sent (250 2.6.0 <qa-receipt-010@qa.example.com> Queued mail for delivery)
+Nov 27 10:19:45 mail-qa postfix/qmgr[812]: 4F3A010012F: removed
+Nov 27 10:19:45 mail-qa postfix/smtpd[11300]: disconnect from app-worker-03.internal[10.0.1.17] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 11:03:27 mail-qa postfix/smtpd[11360]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 11:03:27 mail-qa postfix/smtpd[11360]: 4F3A011013A: client=app-worker-01.internal[10.0.1.15]
+Nov 27 11:03:27 mail-qa postfix/cleanup[11362]: 4F3A011013A: message-id=<qa-rate-011@qa.example.com>
+Nov 27 11:03:27 mail-qa postfix/qmgr[812]: 4F3A011013A: from=<notifications@qa.example.com>, size=3310, nrcpt=1 (queue active)
+Nov 27 11:03:28 mail-qa postfix/smtp[11365]: 4F3A011013A: to=<ratelimited@yahoo.com>, relay=mta6.am0.yahoodns.net[67.195.228.110]:25, delay=1.4, delays=0.05/0.01/0.54/0.8, dsn=4.2.1, status=deferred (host mta6.am0.yahoodns.net[67.195.228.110] said: 450 4.2.1 The user you are trying to contact is receiving mail at a rate that prevents additional messages from being delivered (in reply to RCPT TO command))
+Nov 27 11:03:28 mail-qa postfix/smtpd[11360]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 11:42:05 mail-qa postfix/smtpd[11420]: connect from app-worker-02.internal[10.0.1.16]
+Nov 27 11:42:05 mail-qa postfix/smtpd[11420]: Anonymous TLS connection established from app-worker-02.internal[10.0.1.16]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 11:42:05 mail-qa postfix/smtpd[11420]: 4F3A012014B: client=app-worker-02.internal[10.0.1.16]
+Nov 27 11:42:05 mail-qa postfix/cleanup[11423]: 4F3A012014B: message-id=<qa-verify-012@qa.example.com>
+Nov 27 11:42:05 mail-qa postfix/qmgr[812]: 4F3A012014B: from=<verify@qa.example.com>, size=1920, nrcpt=1 (queue active)
+Nov 27 11:42:06 mail-qa postfix/smtp[11426]: Trusted TLS connection established to gmail-smtp-in.l.google.com[142.250.102.27]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 11:42:06 mail-qa postfix/smtp[11426]: 4F3A012014B: to=<grace.qa@gmail.com>, relay=gmail-smtp-in.l.google.com[142.250.102.27]:25, delay=0.92, delays=0.04/0.01/0.38/0.49, dsn=2.0.0, status=sent (250 2.0.0 OK  1732707726 g18-20020a05600c)
+Nov 27 11:42:06 mail-qa postfix/qmgr[812]: 4F3A012014B: removed
+Nov 27 11:42:06 mail-qa postfix/smtpd[11420]: disconnect from app-worker-02.internal[10.0.1.16] ehlo=2 starttls=1 mail=1 rcpt=1 data=1 quit=1 commands=7
+Nov 27 12:15:50 mail-qa postfix/smtpd[11480]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 12:15:50 mail-qa postfix/smtpd[11480]: 4F3A013015C: client=app-worker-01.internal[10.0.1.15]
+Nov 27 12:15:50 mail-qa postfix/cleanup[11483]: 4F3A013015C: message-id=<qa-policy-013@qa.example.com>
+Nov 27 12:15:50 mail-qa postfix/qmgr[812]: 4F3A013015C: from=<campaigns@qa.example.com>, size=14200, nrcpt=1 (queue active)
+Nov 27 12:15:51 mail-qa postfix/smtp[11486]: 4F3A013015C: to=<blocked@strict-corp.example>, relay=mx.strict-corp.example[198.51.100.140]:25, delay=1.15, delays=0.05/0.01/0.41/0.68, dsn=5.7.1, status=bounced (host mx.strict-corp.example[198.51.100.140] said: 550 5.7.1 Service unavailable; Client host blocked by local policy (in reply to RCPT TO command))
+Nov 27 12:15:51 mail-qa postfix/cleanup[11483]: 4F3A013016D: message-id=<20261127121551.4F3A013016D@mail-qa.qa.example.com>
+Nov 27 12:15:51 mail-qa postfix/bounce[11489]: 4F3A013015C: sender non-delivery notification: 4F3A013016D
+Nov 27 12:15:51 mail-qa postfix/qmgr[812]: 4F3A013016D: from=<>, size=16800, nrcpt=1 (queue active)
+Nov 27 12:15:51 mail-qa postfix/qmgr[812]: 4F3A013015C: removed
+Nov 27 12:15:52 mail-qa postfix/local[11491]: 4F3A013016D: to=<campaigns@qa.example.com>, relay=local, delay=0.11, delays=0.01/0.01/0/0.09, dsn=2.0.0, status=sent (delivered to maildir)
+Nov 27 12:15:52 mail-qa postfix/qmgr[812]: 4F3A013016D: removed
+Nov 27 12:15:52 mail-qa postfix/smtpd[11480]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 12:55:19 mail-qa postfix/smtpd[11550]: connect from unknown[45.155.205.91]
+Nov 27 12:55:19 mail-qa postfix/smtpd[11550]: NOQUEUE: reject: RCPT from unknown[45.155.205.91]: 454 4.7.1 <target@gmail.com>: Relay access denied; from=<admin@spoof.example> to=<target@gmail.com> proto=ESMTP helo=<vps-45-155>
+Nov 27 12:55:19 mail-qa postfix/smtpd[11550]: disconnect from unknown[45.155.205.91] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
+Nov 27 13:20:04 mail-qa postfix/smtpd[11600]: connect from app-worker-02.internal[10.0.1.16]
+Nov 27 13:20:04 mail-qa postfix/smtpd[11600]: 4F3A014017E: client=app-worker-02.internal[10.0.1.16]
+Nov 27 13:20:04 mail-qa postfix/cleanup[11602]: 4F3A014017E: message-id=<qa-order-014@qa.example.com>
+Nov 27 13:20:04 mail-qa postfix/qmgr[812]: 4F3A014017E: from=<orders@qa.example.com>, size=8230, nrcpt=2 (queue active)
+Nov 27 13:20:05 mail-qa postfix/smtp[11605]: Trusted TLS connection established to gmail-smtp-in.l.google.com[142.250.102.27]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 13:20:05 mail-qa postfix/smtp[11605]: 4F3A014017E: to=<henry.buyer@gmail.com>, relay=gmail-smtp-in.l.google.com[142.250.102.27]:25, delay=1.02, delays=0.05/0.01/0.39/0.57, dsn=2.0.0, status=sent (250 2.0.0 OK  1732713605 h22-20020a05600c)
+Nov 27 13:20:05 mail-qa postfix/lmtp[11608]: 4F3A014017E: to=<qa-archive@qa.example.com>, relay=mail-qa.qa.example.com[private/dovecot-lmtp], delay=0.14, delays=0.05/0.01/0.02/0.06, dsn=2.0.0, status=sent (250 2.0.0 <qa-archive@qa.example.com> Saved)
+Nov 27 13:20:05 mail-qa postfix/qmgr[812]: 4F3A014017E: removed
+Nov 27 13:20:05 mail-qa postfix/smtpd[11600]: disconnect from app-worker-02.internal[10.0.1.16] ehlo=1 mail=1 rcpt=2 data=1 quit=1 commands=6
+Nov 27 14:08:12 mail-qa postfix/smtpd[11670]: connect from app-worker-03.internal[10.0.1.17]
+Nov 27 14:08:12 mail-qa postfix/smtpd[11670]: 4F3A015018F: client=app-worker-03.internal[10.0.1.17]
+Nov 27 14:08:12 mail-qa postfix/cleanup[11672]: 4F3A015018F: message-id=<qa-timeout-015@qa.example.com>
+Nov 27 14:08:12 mail-qa postfix/qmgr[812]: 4F3A015018F: from=<sync@qa.example.com>, size=4510, nrcpt=1 (queue active)
+Nov 27 14:08:42 mail-qa postfix/smtp[11675]: connect to mail.unreachable-lab.example[203.0.113.200]:25: Connection timed out
+Nov 27 14:08:42 mail-qa postfix/smtp[11675]: 4F3A015018F: to=<lab@unreachable-lab.example>, relay=none, delay=30.08, delays=0.04/0.01/30.03/0, dsn=4.4.1, status=deferred (connect to mail.unreachable-lab.example[203.0.113.200]:25: Connection timed out)
+Nov 27 14:08:42 mail-qa postfix/smtpd[11670]: disconnect from app-worker-03.internal[10.0.1.17] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 14:44:30 mail-qa postfix/smtpd[11720]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 14:44:30 mail-qa postfix/smtpd[11720]: Anonymous TLS connection established from app-worker-01.internal[10.0.1.15]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 14:44:30 mail-qa postfix/smtpd[11720]: 4F3A016019A: client=app-worker-01.internal[10.0.1.15]
+Nov 27 14:44:30 mail-qa postfix/cleanup[11722]: 4F3A016019A: message-id=<qa-export-016@qa.example.com>
+Nov 27 14:44:30 mail-qa postfix/qmgr[812]: 4F3A016019A: from=<reports@qa.example.com>, size=128900, nrcpt=1 (queue active)
+Nov 27 14:44:32 mail-qa postfix/smtp[11725]: Trusted TLS connection established to outlook-com.olc.protection.outlook.com[52.101.68.18]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 14:44:32 mail-qa postfix/smtp[11725]: 4F3A016019A: to=<iris.pm@outlook.com>, relay=outlook-com.olc.protection.outlook.com[52.101.68.18]:25, delay=1.9, delays=0.12/0.02/0.61/1.15, dsn=2.0.0, status=sent (250 2.6.0 <qa-export-016@qa.example.com> Queued mail for delivery)
+Nov 27 14:44:32 mail-qa postfix/qmgr[812]: 4F3A016019A: removed
+Nov 27 14:44:32 mail-qa postfix/smtpd[11720]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=2 starttls=1 mail=1 rcpt=1 data=1 quit=1 commands=7
+Nov 27 15:12:08 mail-qa postfix/smtpd[11780]: connect from unknown[193.142.146.39]
+Nov 27 15:12:08 mail-qa postfix/smtpd[11780]: NOQUEUE: reject: RCPT from unknown[193.142.146.39]: 554 5.7.1 Service unavailable; Client host [193.142.146.39] blocked using zen.spamhaus.org; from=<bounce@junk-mail.example> to=<info@qa.example.com> proto=ESMTP helo=<srv.junk-mail.example>
+Nov 27 15:12:08 mail-qa postfix/smtpd[11780]: disconnect from unknown[193.142.146.39] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
+Nov 27 15:39:51 mail-qa postfix/smtpd[11830]: connect from app-worker-02.internal[10.0.1.16]
+Nov 27 15:39:51 mail-qa postfix/smtpd[11830]: 4F3A017020B: client=app-worker-02.internal[10.0.1.16]
+Nov 27 15:39:51 mail-qa postfix/cleanup[11833]: 4F3A017020B: message-id=<qa-invite-017@qa.example.com>
+Nov 27 15:39:51 mail-qa postfix/qmgr[812]: 4F3A017020B: from=<team@qa.example.com>, size=3720, nrcpt=2 (queue active)
+Nov 27 15:39:52 mail-qa postfix/smtp[11836]: Trusted TLS connection established to mx1.fastmail.example[66.111.4.72]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 15:39:52 mail-qa postfix/smtp[11836]: 4F3A017020B: to=<jack@fastmail.example>, relay=mx1.fastmail.example[66.111.4.72]:25, delay=0.95, delays=0.04/0.01/0.41/0.49, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as FM8890)
+Nov 27 15:39:52 mail-qa postfix/smtp[11837]: 4F3A017020B: to=<kate@proton.me>, relay=mail.protonmail.ch[185.70.42.128]:25, delay=1.32, delays=0.04/0.01/0.58/0.69, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as PM5512)
+Nov 27 15:39:52 mail-qa postfix/qmgr[812]: 4F3A017020B: removed
+Nov 27 15:39:52 mail-qa postfix/smtpd[11830]: disconnect from app-worker-02.internal[10.0.1.16] ehlo=1 mail=1 rcpt=2 data=1 quit=1 commands=6
+Nov 27 16:05:17 mail-qa postfix/smtpd[11900]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 16:05:17 mail-qa postfix/smtpd[11900]: 4F3A018021C: client=app-worker-01.internal[10.0.1.15]
+Nov 27 16:05:17 mail-qa postfix/cleanup[11902]: 4F3A018021C: message-id=<qa-dns-018@qa.example.com>
+Nov 27 16:05:17 mail-qa postfix/qmgr[812]: 4F3A018021C: from=<noreply@qa.example.com>, size=1980, nrcpt=1 (queue active)
+Nov 27 16:05:18 mail-qa postfix/smtp[11905]: 4F3A018021C: to=<user@bad-mx-domain.invalid>, relay=none, delay=0.45, delays=0.04/0.01/0.4/0, dsn=5.4.4, status=bounced (Host or domain name not found. Name service error for name=bad-mx-domain.invalid type=A: Host not found)
+Nov 27 16:05:18 mail-qa postfix/cleanup[11902]: 4F3A018022D: message-id=<20261127160518.4F3A018022D@mail-qa.qa.example.com>
+Nov 27 16:05:18 mail-qa postfix/bounce[11908]: 4F3A018021C: sender non-delivery notification: 4F3A018022D
+Nov 27 16:05:18 mail-qa postfix/qmgr[812]: 4F3A018022D: from=<>, size=4220, nrcpt=1 (queue active)
+Nov 27 16:05:18 mail-qa postfix/qmgr[812]: 4F3A018021C: removed
+Nov 27 16:05:18 mail-qa postfix/local[11910]: 4F3A018022D: to=<noreply@qa.example.com>, relay=local, delay=0.08, delays=0.01/0.01/0/0.06, dsn=2.0.0, status=sent (delivered to maildir)
+Nov 27 16:05:18 mail-qa postfix/qmgr[812]: 4F3A018022D: removed
+Nov 27 16:05:18 mail-qa postfix/smtpd[11900]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 16:28:40 mail-qa postfix/smtpd[11960]: connect from app-worker-03.internal[10.0.1.17]
+Nov 27 16:28:40 mail-qa postfix/smtpd[11960]: Anonymous TLS connection established from app-worker-03.internal[10.0.1.17]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 16:28:40 mail-qa postfix/smtpd[11960]: 4F3A019023E: client=app-worker-03.internal[10.0.1.17]
+Nov 27 16:28:40 mail-qa postfix/cleanup[11963]: 4F3A019023E: message-id=<qa-smoke-019@qa.example.com>
+Nov 27 16:28:40 mail-qa postfix/qmgr[812]: 4F3A019023E: from=<smoke@qa.example.com>, size=2650, nrcpt=1 (queue active)
+Nov 27 16:28:41 mail-qa postfix/smtp[11966]: Trusted TLS connection established to gmail-smtp-in.l.google.com[142.250.102.26]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 16:28:41 mail-qa postfix/smtp[11966]: 4F3A019023E: to=<leo.qa@gmail.com>, relay=gmail-smtp-in.l.google.com[142.250.102.26]:25, delay=0.87, delays=0.04/0.01/0.32/0.5, dsn=2.0.0, status=sent (250 2.0.0 OK  1732724921 l11-20020a05600c)
+Nov 27 16:28:41 mail-qa postfix/qmgr[812]: 4F3A019023E: removed
+Nov 27 16:28:41 mail-qa postfix/smtpd[11960]: disconnect from app-worker-03.internal[10.0.1.17] ehlo=2 starttls=1 mail=1 rcpt=1 data=1 quit=1 commands=7
+Nov 27 17:04:11 mail-qa postfix/smtpd[12010]: connect from unknown[103.214.68.12]
+Nov 27 17:04:11 mail-qa postfix/smtpd[12010]: NOQUEUE: reject: RCPT from unknown[103.214.68.12]: 554 5.7.1 <ceo@qa.example.com>: Sender address rejected: SPF validation failed; from=<ceo@qa.example.com> to=<finance@qa.example.com> proto=ESMTP helo=<mail.fake-sender.org>
+Nov 27 17:04:11 mail-qa postfix/smtpd[12010]: disconnect from unknown[103.214.68.12] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
+Nov 27 17:31:55 mail-qa postfix/smtpd[12060]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 17:31:55 mail-qa postfix/smtpd[12060]: 4F3A020024F: client=app-worker-01.internal[10.0.1.15]
+Nov 27 17:31:55 mail-qa postfix/cleanup[12062]: 4F3A020024F: message-id=<qa-webhook-020@qa.example.com>
+Nov 27 17:31:55 mail-qa postfix/qmgr[812]: 4F3A020024F: from=<hooks@qa.example.com>, size=5120, nrcpt=1 (queue active)
+Nov 27 17:31:56 mail-qa postfix/smtp[12065]: Verified TLS connection established to mx.sendgrid.example[167.89.115.20]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 17:31:56 mail-qa postfix/smtp[12065]: 4F3A020024F: to=<mia@partner-saas.example>, relay=mx.sendgrid.example[167.89.115.20]:25, delay=1.18, delays=0.04/0.01/0.46/0.67, dsn=2.0.0, status=sent (250 Ok: queued as SG9012)
+Nov 27 17:31:56 mail-qa postfix/qmgr[812]: 4F3A020024F: removed
+Nov 27 17:31:56 mail-qa postfix/smtpd[12060]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 18:10:02 mail-qa postfix/smtpd[12110]: connect from app-worker-02.internal[10.0.1.16]
+Nov 27 18:10:02 mail-qa postfix/smtpd[12110]: 4F3A021025A: client=app-worker-02.internal[10.0.1.16]
+Nov 27 18:10:02 mail-qa postfix/cleanup[12112]: 4F3A021025A: message-id=<qa-batch-021@qa.example.com>
+Nov 27 18:10:02 mail-qa postfix/qmgr[812]: 4F3A021025A: from=<batch@qa.example.com>, size=7400, nrcpt=2 (queue active)
+Nov 27 18:10:03 mail-qa postfix/smtp[12115]: 4F3A021025A: to=<noah@outlook.com>, relay=outlook-com.olc.protection.outlook.com[52.101.68.12]:25, delay=1.25, delays=0.05/0.01/0.5/0.69, dsn=2.0.0, status=sent (250 2.6.0 <qa-batch-021@qa.example.com> Queued mail for delivery)
+Nov 27 18:10:04 mail-qa postfix/smtp[12116]: 4F3A021025A: to=<olivia@greylist-vendor.example>, relay=mx.greylist-vendor.example[198.51.100.90]:25, delay=1.9, delays=0.05/0.02/0.55/1.28, dsn=4.7.1, status=deferred (host mx.greylist-vendor.example[198.51.100.90] said: 451 4.7.1 Greylisted, please try again in 300 seconds (in reply to RCPT TO command))
+Nov 27 18:10:04 mail-qa postfix/smtpd[12110]: disconnect from app-worker-02.internal[10.0.1.16] ehlo=1 mail=1 rcpt=2 data=1 quit=1 commands=6
+Nov 27 18:45:29 mail-qa postfix/smtpd[12170]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 18:45:29 mail-qa postfix/smtpd[12170]: Anonymous TLS connection established from app-worker-01.internal[10.0.1.15]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 18:45:29 mail-qa postfix/smtpd[12170]: 4F3A022026B: client=app-worker-01.internal[10.0.1.15]
+Nov 27 18:45:29 mail-qa postfix/cleanup[12172]: 4F3A022026B: message-id=<qa-magiclink-022@qa.example.com>
+Nov 27 18:45:29 mail-qa postfix/qmgr[812]: 4F3A022026B: from=<auth@qa.example.com>, size=2890, nrcpt=1 (queue active)
+Nov 27 18:45:30 mail-qa postfix/smtp[12175]: Trusted TLS connection established to gmail-smtp-in.l.google.com[142.250.102.27]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 18:45:30 mail-qa postfix/smtp[12175]: 4F3A022026B: to=<paul.qa@gmail.com>, relay=gmail-smtp-in.l.google.com[142.250.102.27]:25, delay=0.9, delays=0.03/0.01/0.34/0.52, dsn=2.0.0, status=sent (250 2.0.0 OK  1732733130 p4-20020a05600c)
+Nov 27 18:45:30 mail-qa postfix/qmgr[812]: 4F3A022026B: removed
+Nov 27 18:45:30 mail-qa postfix/smtpd[12170]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=2 starttls=1 mail=1 rcpt=1 data=1 quit=1 commands=7
+Nov 27 19:02:14 mail-qa postfix/smtpd[12220]: connect from unknown[178.128.94.211]
+Nov 27 19:02:14 mail-qa postfix/smtpd[12220]: NOQUEUE: reject: RCPT from unknown[178.128.94.211]: 454 4.7.1 <anyone@random-external.org>: Relay access denied; from=<test@scanner.net> to=<anyone@random-external.org> proto=ESMTP helo=<do-droplet>
+Nov 27 19:02:14 mail-qa postfix/smtpd[12220]: disconnect from unknown[178.128.94.211] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
+Nov 27 19:22:40 mail-qa postfix/smtpd[12260]: connect from app-worker-03.internal[10.0.1.17]
+Nov 27 19:22:40 mail-qa postfix/smtpd[12260]: 4F3A023027C: client=app-worker-03.internal[10.0.1.17]
+Nov 27 19:22:40 mail-qa postfix/cleanup[12262]: 4F3A023027C: message-id=<qa-audit-023@qa.example.com>
+Nov 27 19:22:40 mail-qa postfix/qmgr[812]: 4F3A023027C: from=<audit@qa.example.com>, size=11200, nrcpt=1 (queue active)
+Nov 27 19:22:41 mail-qa postfix/smtp[12265]: 4F3A023027C: to=<expired-test@old-relay.example>, relay=none, delay=432005, delays=432004/0.02/0.4/0, dsn=4.4.7, status=expired (Cannot start TLS: handshake failure; queue lifetime exceeded)
+Nov 27 19:22:41 mail-qa postfix/qmgr[812]: 4F3A023027C: removed
+Nov 27 19:22:41 mail-qa postfix/smtpd[12260]: disconnect from app-worker-03.internal[10.0.1.17] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 19:48:10 mail-qa postfix/smtpd[12310]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 19:48:10 mail-qa postfix/smtpd[12310]: Anonymous TLS connection established from app-worker-01.internal[10.0.1.15]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 19:48:10 mail-qa postfix/smtpd[12310]: 4F3A024028D: client=app-worker-01.internal[10.0.1.15]
+Nov 27 19:48:10 mail-qa postfix/cleanup[12312]: 4F3A024028D: message-id=<qa-staging-024@qa.example.com>
+Nov 27 19:48:10 mail-qa postfix/qmgr[812]: 4F3A024028D: from=<staging@qa.example.com>, size=4780, nrcpt=1 (queue active)
+Nov 27 19:48:11 mail-qa postfix/smtp[12315]: Trusted TLS connection established to gmail-smtp-in.l.google.com[142.250.102.27]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 19:48:11 mail-qa postfix/smtp[12315]: 4F3A024028D: to=<quinn.qa@gmail.com>, relay=gmail-smtp-in.l.google.com[142.250.102.27]:25, delay=0.94, delays=0.04/0.01/0.37/0.52, dsn=2.0.0, status=sent (250 2.0.0 OK  1732736891 q21-20020a05600c)
+Nov 27 19:48:11 mail-qa postfix/qmgr[812]: 4F3A024028D: removed
+Nov 27 19:48:11 mail-qa postfix/smtpd[12310]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=2 starttls=1 mail=1 rcpt=1 data=1 quit=1 commands=7
+Nov 27 20:15:33 mail-qa postfix/smtpd[12370]: connect from app-worker-02.internal[10.0.1.16]
+Nov 27 20:15:33 mail-qa postfix/smtpd[12370]: 4F3A025029E: client=app-worker-02.internal[10.0.1.16]
+Nov 27 20:15:33 mail-qa postfix/cleanup[12372]: 4F3A025029E: message-id=<qa-dmarc-025@qa.example.com>
+Nov 27 20:15:33 mail-qa postfix/qmgr[812]: 4F3A025029E: from=<dmarc@qa.example.com>, size=15420, nrcpt=1 (queue active)
+Nov 27 20:15:34 mail-qa postfix/smtp[12375]: Trusted TLS connection established to mx.yahoo.com[67.195.204.73]:25: TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits)
+Nov 27 20:15:34 mail-qa postfix/smtp[12375]: 4F3A025029E: to=<rachel@yahoo.com>, relay=mta5.am0.yahoodns.net[67.195.204.73]:25, delay=1.1, delays=0.05/0.01/0.46/0.58, dsn=2.0.0, status=sent (250 ok dirdel)
+Nov 27 20:15:34 mail-qa postfix/qmgr[812]: 4F3A025029E: removed
+Nov 27 20:15:34 mail-qa postfix/smtpd[12370]: disconnect from app-worker-02.internal[10.0.1.16] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 20:42:18 mail-qa postfix/smtpd[12420]: connect from unknown[185.220.101.45]
+Nov 27 20:42:18 mail-qa postfix/smtpd[12420]: NOQUEUE: reject: RCPT from unknown[185.220.101.45]: 554 5.7.1 Service unavailable; Client host [185.220.101.45] blocked using zen.spamhaus.org; from=<offers@bulk-promo.biz> to=<qa-inbox@qa.example.com> proto=ESMTP helo=<mail.bulk-promo.biz>
+Nov 27 20:42:18 mail-qa postfix/smtpd[12420]: disconnect from unknown[185.220.101.45] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
+Nov 27 21:05:44 mail-qa postfix/smtpd[12470]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 21:05:44 mail-qa postfix/smtpd[12470]: 4F3A026030F: client=app-worker-01.internal[10.0.1.15]
+Nov 27 21:05:44 mail-qa postfix/cleanup[12472]: 4F3A026030F: message-id=<qa-bounce-026@qa.example.com>
+Nov 27 21:05:44 mail-qa postfix/qmgr[812]: 4F3A026030F: from=<noreply@qa.example.com>, size=3100, nrcpt=1 (queue active)
+Nov 27 21:05:45 mail-qa postfix/smtp[12475]: 4F3A026030F: to=<unknown.rcpt@outlook.com>, relay=outlook-com.olc.protection.outlook.com[52.101.68.12]:25, delay=1.22, delays=0.04/0.01/0.49/0.68, dsn=5.1.10, status=bounced (host outlook-com.olc.protection.outlook.com[52.101.68.12] said: 550 5.1.10 RESOLVER.ADR.RecipientNotFound; Recipient unknown.rcpt@outlook.com not found by SMTP address lookup (in reply to end of DATA command))
+Nov 27 21:05:45 mail-qa postfix/cleanup[12472]: 4F3A026031A: message-id=<20261127210545.4F3A026031A@mail-qa.qa.example.com>
+Nov 27 21:05:45 mail-qa postfix/bounce[12478]: 4F3A026030F: sender non-delivery notification: 4F3A026031A
+Nov 27 21:05:45 mail-qa postfix/qmgr[812]: 4F3A026031A: from=<>, size=5600, nrcpt=1 (queue active)
+Nov 27 21:05:45 mail-qa postfix/qmgr[812]: 4F3A026030F: removed
+Nov 27 21:05:46 mail-qa postfix/local[12480]: 4F3A026031A: to=<noreply@qa.example.com>, relay=local, delay=0.08, delays=0.01/0.01/0/0.06, dsn=2.0.0, status=sent (delivered to maildir)
+Nov 27 21:05:46 mail-qa postfix/qmgr[812]: 4F3A026031A: removed
+Nov 27 21:05:46 mail-qa postfix/smtpd[12470]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 21:32:10 mail-qa postfix/smtpd[12520]: connect from app-worker-03.internal[10.0.1.17]
+Nov 27 21:32:10 mail-qa postfix/smtpd[12520]: Anonymous TLS connection established from app-worker-03.internal[10.0.1.17]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 21:32:10 mail-qa postfix/smtpd[12520]: 4F3A027032B: client=app-worker-03.internal[10.0.1.17]
+Nov 27 21:32:10 mail-qa postfix/cleanup[12522]: 4F3A027032B: message-id=<qa-canary-027@qa.example.com>
+Nov 27 21:32:10 mail-qa postfix/qmgr[812]: 4F3A027032B: from=<canary@qa.example.com>, size=2210, nrcpt=1 (queue active)
+Nov 27 21:32:11 mail-qa postfix/smtp[12525]: Trusted TLS connection established to mx1.fastmail.example[66.111.4.72]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 21:32:11 mail-qa postfix/smtp[12525]: 4F3A027032B: to=<sam@fastmail.example>, relay=mx1.fastmail.example[66.111.4.72]:25, delay=0.91, delays=0.04/0.01/0.39/0.47, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as FM9124)
+Nov 27 21:32:11 mail-qa postfix/qmgr[812]: 4F3A027032B: removed
+Nov 27 21:32:11 mail-qa postfix/smtpd[12520]: disconnect from app-worker-03.internal[10.0.1.17] ehlo=2 starttls=1 mail=1 rcpt=1 data=1 quit=1 commands=7
+Nov 27 21:55:02 mail-qa postfix/smtpd[12570]: connect from app-worker-02.internal[10.0.1.16]
+Nov 27 21:55:02 mail-qa postfix/smtpd[12570]: 4F3A028033C: client=app-worker-02.internal[10.0.1.16]
+Nov 27 21:55:02 mail-qa postfix/cleanup[12572]: 4F3A028033C: message-id=<qa-pending-028@qa.example.com>
+Nov 27 21:55:02 mail-qa postfix/qmgr[812]: 4F3A028033C: from=<queue-test@qa.example.com>, size=7140, nrcpt=1 (queue active)
+Nov 27 21:55:02 mail-qa postfix/smtpd[12570]: disconnect from app-worker-02.internal[10.0.1.16] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 22:08:19 mail-qa postfix/smtpd[12610]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 22:08:19 mail-qa postfix/smtpd[12610]: Anonymous TLS connection established from app-worker-01.internal[10.0.1.15]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 22:08:19 mail-qa postfix/smtpd[12610]: 4F3A029034D: client=app-worker-01.internal[10.0.1.15]
+Nov 27 22:08:19 mail-qa postfix/cleanup[12612]: 4F3A029034D: message-id=<qa-final-029@qa.example.com>
+Nov 27 22:08:19 mail-qa postfix/qmgr[812]: 4F3A029034D: from=<qa-runner@qa.example.com>, size=3950, nrcpt=2 (queue active)
+Nov 27 22:08:20 mail-qa postfix/smtp[12615]: Trusted TLS connection established to gmail-smtp-in.l.google.com[142.250.102.27]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 22:08:20 mail-qa postfix/smtp[12615]: 4F3A029034D: to=<tina.qa@gmail.com>, relay=gmail-smtp-in.l.google.com[142.250.102.27]:25, delay=0.98, delays=0.04/0.01/0.41/0.52, dsn=2.0.0, status=sent (250 2.0.0 OK  1732745300 t7-20020a05600c)
+Nov 27 22:08:21 mail-qa postfix/smtp[12616]: 4F3A029034D: to=<victor@proton.me>, relay=mail.protonmail.ch[185.70.42.128]:25, delay=1.41, delays=0.04/0.01/0.56/0.8, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as PM6109)
+Nov 27 22:08:21 mail-qa postfix/qmgr[812]: 4F3A029034D: removed
+Nov 27 22:08:21 mail-qa postfix/smtpd[12610]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=2 starttls=1 mail=1 rcpt=1 data=1 quit=1 commands=7
+Nov 27 22:18:05 mail-qa postfix/smtpd[12650]: connect from app-worker-02.internal[10.0.1.16]
+Nov 27 22:18:05 mail-qa postfix/smtpd[12650]: 4F3A030035E: client=app-worker-02.internal[10.0.1.16]
+Nov 27 22:18:05 mail-qa postfix/cleanup[12652]: 4F3A030035E: message-id=<qa-timeout-030@qa.example.com>
+Nov 27 22:18:05 mail-qa postfix/qmgr[812]: 4F3A030035E: from=<alerts@qa.example.com>, size=1890, nrcpt=1 (queue active)
+Nov 27 22:18:35 mail-qa postfix/smtp[12655]: connect to mx.down-host.example[203.0.113.250]:25: Connection timed out
+Nov 27 22:18:35 mail-qa postfix/smtp[12655]: 4F3A030035E: to=<oncall@down-host.example>, relay=none, delay=30.05, delays=0.03/0.01/30.01/0, dsn=4.4.1, status=deferred (connect to mx.down-host.example[203.0.113.250]:25: Connection timed out)
+Nov 27 22:18:35 mail-qa postfix/smtpd[12650]: disconnect from app-worker-02.internal[10.0.1.16] ehlo=1 mail=1 rcpt=1 data=1 quit=1 commands=5
+Nov 27 22:25:12 mail-qa postfix/smtpd[12690]: connect from unknown[185.220.101.88]
+Nov 27 22:25:12 mail-qa postfix/smtpd[12690]: NOQUEUE: reject: RCPT from unknown[185.220.101.88]: 554 5.7.1 Service unavailable; Client host [185.220.101.88] blocked using zen.spamhaus.org; from=<vip@casino-offers.biz> to=<support@qa.example.com> proto=ESMTP helo=<node88.casino-offers.biz>
+Nov 27 22:25:12 mail-qa postfix/smtpd[12690]: disconnect from unknown[185.220.101.88] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
+Nov 27 22:31:40 mail-qa postfix/smtpd[12730]: connect from app-worker-01.internal[10.0.1.15]
+Nov 27 22:31:40 mail-qa postfix/smtpd[12730]: Anonymous TLS connection established from app-worker-01.internal[10.0.1.15]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 22:31:40 mail-qa postfix/smtpd[12730]: 4F3A031036F: client=app-worker-01.internal[10.0.1.15]
+Nov 27 22:31:40 mail-qa postfix/cleanup[12732]: 4F3A031036F: message-id=<qa-summary-031@qa.example.com>
+Nov 27 22:31:40 mail-qa postfix/qmgr[812]: 4F3A031036F: from=<summary@qa.example.com>, size=10420, nrcpt=2 (queue active)
+Nov 27 22:31:41 mail-qa postfix/smtp[12735]: Trusted TLS connection established to outlook-com.olc.protection.outlook.com[52.101.68.12]:25: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Nov 27 22:31:41 mail-qa postfix/smtp[12735]: 4F3A031036F: to=<uma.lead@outlook.com>, relay=outlook-com.olc.protection.outlook.com[52.101.68.12]:25, delay=1.12, delays=0.04/0.01/0.46/0.61, dsn=2.0.0, status=sent (250 2.6.0 <qa-summary-031@qa.example.com> Queued mail for delivery)
+Nov 27 22:31:41 mail-qa postfix/smtp[12736]: 4F3A031036F: to=<walt.qa@gmail.com>, relay=gmail-smtp-in.l.google.com[142.250.102.27]:25, delay=1.24, delays=0.04/0.01/0.42/0.77, dsn=2.0.0, status=sent (250 2.0.0 OK  1732746701 w3-20020a05600c)
+Nov 27 22:31:41 mail-qa postfix/qmgr[812]: 4F3A031036F: removed
+Nov 27 22:31:41 mail-qa postfix/smtpd[12730]: disconnect from app-worker-01.internal[10.0.1.15] ehlo=2 starttls=1 mail=1 rcpt=2 data=1 quit=1 commands=8
