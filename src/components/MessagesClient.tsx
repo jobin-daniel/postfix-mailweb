@@ -6,6 +6,8 @@ import {
   Radio,
   RotateCcw,
   Search,
+  Trash2,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -66,7 +68,13 @@ export function MessagesClient() {
   const [liveConnected, setLiveConnected] = useState(false);
   const [liveEventCount, setLiveEventCount] = useState(0);
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
+
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const selectAllRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
@@ -173,6 +181,81 @@ export function MessagesClient() {
     setDateFrom("");
     setDateTo("");
     setPage(1);
+  };
+
+  const visibleIds = data?.items.map((m) => m.queueId) ?? [];
+  const allVisibleSelected =
+    visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
+  const someVisibleSelected =
+    visibleIds.some((id) => selectedIds.has(id)) && !allVisibleSelected;
+
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = someVisibleSelected;
+    }
+  }, [someVisibleSelected]);
+
+  const toggleSelectAllVisible = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allVisibleSelected) {
+        for (const id of visibleIds) next.delete(id);
+      } else {
+        for (const id of visibleIds) next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectRow = (queueId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(queueId)) {
+        next.delete(queueId);
+      } else {
+        next.add(queueId);
+      }
+      return next;
+    });
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedIds.size === 0 || deleting) return;
+    setDeleting(true);
+    setError(null);
+    setDeleteSuccess(null);
+    try {
+      const res = await fetch("/api/messages", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ queueIds: Array.from(selectedIds) }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(body.error || `Delete failed (${res.status})`);
+      }
+
+      const deletedCount = Array.isArray(body.deletedQueueIds)
+        ? body.deletedQueueIds.length
+        : selectedIds.size;
+      const filesCount = Array.isArray(body.deletedFiles)
+        ? body.deletedFiles.length
+        : 0;
+
+      setSelectedIds(new Set());
+      setConfirmOpen(false);
+      setDeleteSuccess(
+        filesCount > 0
+          ? `Deleted ${deletedCount} email${deletedCount === 1 ? "" : "s"} and removed ${filesCount} physical file${filesCount === 1 ? "" : "s"}.`
+          : `Deleted ${deletedCount} email${deletedCount === 1 ? "" : "s"}.`,
+      );
+      await refreshMessages();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete messages");
+      setConfirmOpen(false);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -301,12 +384,62 @@ export function MessagesClient() {
         </div>
       )}
 
+      {deleteSuccess && (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
+          <span>{deleteSuccess}</span>
+          <button
+            type="button"
+            onClick={() => setDeleteSuccess(null)}
+            aria-label="Dismiss notification"
+            className="rounded p-1 text-emerald-700 hover:bg-emerald-100 dark:text-emerald-300 dark:hover:bg-emerald-900/50"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {selectedIds.size > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-200 bg-indigo-50/80 px-4 py-2.5 text-sm dark:border-indigo-900/60 dark:bg-indigo-950/30">
+          <div className="font-medium text-indigo-950 dark:text-indigo-200">
+            {selectedIds.size} email{selectedIds.size === 1 ? "" : "s"} selected
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedIds(new Set())}
+              className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              Clear selection
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-rose-700 dark:bg-rose-600 dark:hover:bg-rose-500"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete selected
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
             <thead className="bg-zinc-50 text-left text-xs font-medium tracking-wider text-zinc-500 uppercase dark:bg-zinc-900/80 dark:text-zinc-400">
               <tr>
+                <th className="w-10 px-4 py-3">
+                  <input
+                    ref={selectAllRef}
+                    type="checkbox"
+                    checked={allVisibleSelected}
+                    onChange={toggleSelectAllVisible}
+                    disabled={visibleIds.length === 0}
+                    aria-label="Select all visible emails"
+                    className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900"
+                  />
+                </th>
                 <th className="px-4 py-3 whitespace-nowrap">Time</th>
                 <th className="px-4 py-3 whitespace-nowrap">Queue ID</th>
                 <th className="px-4 py-3">From</th>
@@ -319,22 +452,35 @@ export function MessagesClient() {
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
               {loading && !data ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-zinc-400">
+                  <td colSpan={8} className="px-4 py-10 text-center text-zinc-400">
                     Loading messages…
                   </td>
                 </tr>
               ) : !data || data.items.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-zinc-500 dark:text-zinc-400">
+                  <td colSpan={8} className="px-4 py-10 text-center text-zinc-500 dark:text-zinc-400">
                     No messages match your filters.
                   </td>
                 </tr>
               ) : (
-                data.items.map((msg) => (
+                data.items.map((msg) => {
+                  const isSelected = selectedIds.has(msg.queueId);
+                  return (
                   <tr
                     key={msg.queueId}
-                    className="transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40"
+                    className={`transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 ${
+                      isSelected ? "bg-indigo-50/50 dark:bg-indigo-950/20" : ""
+                    }`}
                   >
+                    <td className="w-10 px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelectRow(msg.queueId)}
+                        aria-label={`Select email ${msg.queueId}`}
+                        className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900"
+                      />
+                    </td>
                     <td className="px-4 py-3 font-mono text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400">
                       {formatTimestamp(msg.lastTimestamp)}
                     </td>
@@ -373,7 +519,8 @@ export function MessagesClient() {
                       {formatDelay(msg.primaryDelay)}
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -439,6 +586,49 @@ export function MessagesClient() {
           </div>
         )}
       </div>
+
+      {confirmOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-confirm-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+        >
+          <div className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+            <h2
+              id="delete-confirm-title"
+              className="text-lg font-semibold text-zinc-900 dark:text-zinc-100"
+            >
+              Delete {selectedIds.size} email{selectedIds.size === 1 ? "" : "s"}?
+            </h2>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              This will permanently remove the selected email
+              {selectedIds.size === 1 ? "" : "s"} and delete their physical archive
+              file{selectedIds.size === 1 ? "" : "s"} from disk. This action cannot
+              be undone.
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => setConfirmOpen(false)}
+                className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleDeleteSelected}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50 dark:bg-rose-600 dark:hover:bg-rose-500"
+              >
+                <Trash2 className="h-4 w-4" />
+                {deleting ? "Deleting…" : "Delete permanently"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

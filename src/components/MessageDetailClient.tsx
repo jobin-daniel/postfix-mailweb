@@ -8,8 +8,10 @@ import {
   Copy,
   Lock,
   Terminal,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { MailMessage, MessageEvent } from "@/lib/postfix/types";
 import { EmailViewer } from "./EmailViewer";
@@ -35,11 +37,15 @@ function formatBytes(bytes: number | null): string {
 }
 
 export function MessageDetailClient({ queueId }: { queueId: string }) {
+  const router = useRouter();
   const [message, setMessage] = useState<MailMessage | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rawOpen, setRawOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -79,6 +85,27 @@ export function MessageDetailClient({ queueId }: { queueId: string }) {
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Clipboard API may fail in non-HTTPS contexts
+    }
+  };
+
+  const handleDelete = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch(
+        `/api/messages/${encodeURIComponent(queueId)}`,
+        { method: "DELETE" },
+      );
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(body.error || `Delete failed (${res.status})`);
+      }
+      router.push("/messages");
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete email");
+      setConfirmDeleteOpen(false);
+      setDeleting(false);
     }
   };
 
@@ -126,7 +153,22 @@ export function MessageDetailClient({ queueId }: { queueId: string }) {
             <StatusBadge status={message.status} />
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setConfirmDeleteOpen(true)}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-3 py-1.5 text-sm font-medium text-rose-700 hover:bg-rose-50 dark:border-rose-900/60 dark:bg-zinc-900 dark:text-rose-400 dark:hover:bg-rose-950/40"
+        >
+          <Trash2 className="h-4 w-4" />
+          Delete email
+        </button>
       </div>
+
+      {deleteError && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-200">
+          {deleteError}
+        </div>
+      )}
 
       {/* Real Email Body Viewer */}
       <EmailViewer queueId={message.queueId} />
@@ -328,6 +370,47 @@ export function MessageDetailClient({ queueId }: { queueId: string }) {
           </div>
         )}
       </div>
+
+      {confirmDeleteOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="detail-delete-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+        >
+          <div className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+            <h2
+              id="detail-delete-title"
+              className="text-lg font-semibold text-zinc-900 dark:text-zinc-100"
+            >
+              Delete email {message.queueId}?
+            </h2>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              This will permanently remove this email and delete its physical
+              archive file from disk. This action cannot be undone.
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => setConfirmDeleteOpen(false)}
+                className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleDelete}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50 dark:bg-rose-600 dark:hover:bg-rose-500"
+              >
+                <Trash2 className="h-4 w-4" />
+                {deleting ? "Deleting…" : "Delete permanently"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

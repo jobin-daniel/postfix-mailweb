@@ -6,9 +6,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { clearArchiveCache } from "@/lib/mail/archive";
 import { clearLogCache } from "@/lib/postfix/cache";
 import { GET as getHealth } from "../health/route";
-import { GET as getMessageDetail } from "../messages/[queueId]/route";
+import { DELETE as deleteMessageDetail, GET as getMessageDetail } from "../messages/[queueId]/route";
 import { GET as getMessageEmail } from "../messages/[queueId]/email/route";
-import { GET as getMessages } from "../messages/route";
+import { DELETE as deleteMessages, GET as getMessages } from "../messages/route";
 import { GET as getStats } from "../stats/route";
 import { GET as getStream } from "../stream/route";
 
@@ -18,6 +18,7 @@ describe("API Route Handlers (file mode)", () => {
   const prevRotated = process.env.MAIL_LOG_INCLUDE_ROTATED;
   const prevTz = process.env.TZ;
   const prevArchiveDir = process.env.MAIL_ARCHIVE_DIR;
+  const prevDeletedStore = process.env.MAIL_DELETED_STORE;
   let tempDir = "";
 
   beforeEach(async () => {
@@ -47,6 +48,7 @@ describe("API Route Handlers (file mode)", () => {
     process.env.MAIL_LOG_PATH = logPath;
     process.env.MAIL_LOG_INCLUDE_ROTATED = "false";
     process.env.TZ = "UTC";
+    process.env.MAIL_DELETED_STORE = path.join(tempDir, "deleted.json");
     clearLogCache();
   });
 
@@ -56,6 +58,7 @@ describe("API Route Handlers (file mode)", () => {
     process.env.MAIL_LOG_INCLUDE_ROTATED = prevRotated;
     process.env.TZ = prevTz;
     process.env.MAIL_ARCHIVE_DIR = prevArchiveDir;
+    process.env.MAIL_DELETED_STORE = prevDeletedStore;
     clearLogCache();
     clearArchiveCache();
     if (tempDir) {
@@ -186,5 +189,77 @@ describe("API Route Handlers (file mode)", () => {
     expect(foundJson.available).toBe(true);
     expect(foundJson.email.subject).toBe("Test Email Body");
     expect(foundJson.email.sanitizedHtml).toContain("<p>Hello real email!</p>");
+  });
+
+  it("DELETE /api/messages removes selected messages from logs and deletes physical archive files", async () => {
+    const archiveDir = path.join(tempDir, "Maildir");
+    const emlPath = path.join(archiveDir, "cur", "1732786200.M1.mail:2,S");
+    await fs.mkdir(path.join(archiveDir, "cur"), { recursive: true });
+    await fs.writeFile(
+      emlPath,
+      [
+        "From: Sender <a@example.com>",
+        "To: u1@gmail.com",
+        "Subject: Delete Me",
+        "Message-ID: <msg-1@example.com>",
+        "",
+        "Body",
+      ].join("\r\n"),
+      "utf8",
+    );
+    process.env.MAIL_ARCHIVE_DIR = archiveDir;
+    clearArchiveCache();
+
+    // Validation check
+    const badReq = new NextRequest("http://localhost:3000/api/messages", {
+      method: "DELETE",
+      body: JSON.stringify({ queueIds: [] }),
+    });
+    const badRes = await deleteMessages(badReq);
+    expect(badRes.status).toBe(400);
+
+    // Bulk delete 2 messages (one with physical archive file, one without)
+    const delReq = new NextRequest("http://localhost:3000/api/messages", {
+      method: "DELETE",
+      body: JSON.stringify({ queueIds: ["4F3A001001A", "4F3A001002B"] }),
+    });
+    const delRes = await deleteMessages(delReq);
+    expect(delRes.status).toBe(200);
+    const delJson = await delRes.json();
+    expect(delJson.deletedQueueIds).toEqual(["4F3A001001A", "4F3A001002B"]);
+    expect(delJson.deletedFiles).toHaveLength(1);
+    expect(delJson.deletedLogLines).toBeGreaterThan(0);
+
+    // Physical archive file must be removed
+    await expect(fs.stat(emlPath)).rejects.toThrow();
+
+    // Deleted messages must no longer appear in GET /api/messages
+    const listRes = await getMessages(new NextRequest("http://localhost:3000/api/messages"));
+    const listJson = await listRes.json();
+    expect(listJson.total).toBe(2);
+    expect(listJson.items.map((i: { queueId: string }) => i.queueId)).not.toContain("4F3A001001A");
+    expect(listJson.items.map((i: { queueId: string }) => i.queueId)).not.toContain("4F3A001002B");
+  });
+
+  it("DELETE /api/messages/[queueId] deletes a single message and handles 404/400", async () => {
+    const delRes = await deleteMessageDetail(
+      new NextRequest("http://localhost:3000/api/messages/4F3A001003C", { method: "DELETE" }),
+      { params: Promise.resolve({ queueId: "4F3A001003C" }) },
+    );
+    expect(delRes.status).toBe(200);
+    const delJson = await delRes.json();
+    expect(delJson.deletedQueueIds).toEqual(["4F3A001003C"]);
+
+    const missingRes = await deleteMessageDetail(
+      new NextRequest("http://localhost:3000/api/messages/4F3A001003C", { method: "DELETE" }),
+      { params: Promise.resolve({ queueId: "4F3A001003C" }) },
+    );
+    expect(missingRes.status).toBe(404);
+
+    const invalidRes = await deleteMessageDetail(
+      new NextRequest("http://localhost:3000/api/messages/bad$id!", { method: "DELETE" }),
+      { params: Promise.resolve({ queueId: "../bad" }) },
+    );
+    expect(invalidRes.status).toBe(400);
   });
 });

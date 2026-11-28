@@ -2,7 +2,12 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { clearArchiveCache, findAttachmentInArchive, findEmailInArchive } from "../archive";
+import {
+  clearArchiveCache,
+  deleteEmailsFromArchive,
+  findAttachmentInArchive,
+  findEmailInArchive,
+} from "../archive";
 import { decodeMimeWords, parseRawEmail, sanitizeEmailHtml } from "../mime";
 
 const SAMPLE_MULTIPART_EML = [
@@ -109,5 +114,16 @@ describe("Maildir archive lookup", () => {
 
     const missing = await findEmailInArchive(tempDir, "missing@example.com");
     expect(missing.status).toBe("not_found");
+  });
+
+  it("physically deletes archived email files by Message-ID", async () => {
+    const filePath = path.join(tempDir, "cur", "1732786200.M123P1.mail:2,S");
+    const result = await deleteEmailsFromArchive(tempDir, ["<abc-123@mail.example.com>"]);
+    expect(result.errors).toEqual([]);
+    expect(result.deletedFiles).toHaveLength(1);
+    await expect(fs.stat(filePath)).rejects.toThrow();
+
+    const afterDelete = await findEmailInArchive(tempDir, "abc-123@mail.example.com");
+    expect(afterDelete.status).toBe("not_found");
   });
 });

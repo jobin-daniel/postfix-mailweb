@@ -1,4 +1,5 @@
 import { getAppConfig, type AppConfig } from "@/lib/config";
+import { readDeletedQueueIds } from "./delete";
 import { parsePostfixLogs } from "./parser";
 import {
   readConfiguredLogs,
@@ -84,9 +85,24 @@ export async function getParsedLogs(
   }
 
   const loaded = await readConfiguredLogs(config);
-  const result = parsePostfixLogs(loaded.text, {
+  const parsed = parsePostfixLogs(loaded.text, {
     timezone: config.timezone,
   });
+
+  const deletedIds = await readDeletedQueueIds(config);
+  let result = parsed;
+  if (deletedIds.size > 0) {
+    const messages = parsed.messages.filter((m) => !deletedIds.has(m.queueId));
+    const byQueueId: Record<string, MailMessage> = {};
+    for (const m of messages) {
+      byQueueId[m.queueId] = m;
+    }
+    result = {
+      ...parsed,
+      messages,
+      byQueueId,
+    };
+  }
 
   cachedEntry = {
     key,

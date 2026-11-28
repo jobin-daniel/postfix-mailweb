@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { filterAndPaginateMessages, getParsedLogs } from "@/lib/postfix/cache";
+import { deleteMessagesByQueueIds, isValidQueueId } from "@/lib/postfix/delete";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,6 +30,37 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to load mail logs";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => null);
+    const rawQueueIds = body && typeof body === "object" ? (body as { queueIds?: unknown }).queueIds : null;
+
+    if (!Array.isArray(rawQueueIds) || rawQueueIds.length === 0) {
+      return NextResponse.json(
+        { error: "Request body must include a non-empty queueIds array" },
+        { status: 400 },
+      );
+    }
+
+    const queueIds: string[] = [];
+    for (const item of rawQueueIds) {
+      if (typeof item !== "string" || !isValidQueueId(item.trim())) {
+        return NextResponse.json(
+          { error: `Invalid queue ID format: ${String(item)}` },
+          { status: 400 },
+        );
+      }
+      queueIds.push(item.trim());
+    }
+
+    const result = await deleteMessagesByQueueIds(queueIds);
+    return NextResponse.json(result);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to delete messages";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
