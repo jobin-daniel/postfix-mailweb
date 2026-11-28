@@ -130,3 +130,28 @@ sudo ln -s /etc/nginx/sites-available/mail-log-viewer /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx -d mail-logs.example.com
 ```
+
+---
+
+## Viewing Email Bodies (Incoming & Outgoing)
+
+Postfix logs (`/var/log/mail.log`) only record envelope and delivery metadata, not email subjects or bodies. To view the full email (rendered HTML, plain text, headers, and attachments) inside `/messages/[queueId]`, archive a copy of every incoming and outgoing message using Postfix `always_bcc`:
+
+1. **Create a local archive user** (or point to an existing Maildir):
+   ```bash
+   sudo adduser --disabled-password --gecos "Mail Archive" archive
+   ```
+2. **Configure Postfix (`/etc/postfix/main.cf`)** to deliver a BCC copy of all incoming and outgoing mail to `archive`'s Maildir:
+   ```ini
+   always_bcc = archive@localhost
+   home_mailbox = Maildir/
+   ```
+   Reload Postfix:
+   ```bash
+   sudo postfix reload
+   ```
+3. **Grant the app user read access** to `/home/archive/Maildir` (e.g. via ACLs or group permissions) and set `MAIL_ARCHIVE_DIR` in `.env`:
+   ```dotenv
+   MAIL_ARCHIVE_DIR=/home/archive/Maildir
+   ```
+4. **Restart the app** (`pm2 restart mail-log-viewer`). When you open any message in `/messages/[queueId]`, the viewer matches `Message-ID` against `MAIL_ARCHIVE_DIR` and renders the email in a sandboxed HTML/Plain-Text reader with attachment downloads.

@@ -6,6 +6,7 @@ export interface AppConfig {
   includeRotated: boolean;
   journaldMaxLines: number;
   timezone: string;
+  archiveDir?: string | null;
 }
 
 const DEFAULT_LOG_PATH = "/var/log/mail.log";
@@ -27,6 +28,7 @@ export function getAppConfig(): AppConfig {
       : DEFAULT_MAX_JOURNAL_LINES;
 
   const timezone = process.env.TZ?.trim() || "UTC";
+  const archiveDir = process.env.MAIL_ARCHIVE_DIR?.trim() || null;
 
   return {
     logSource,
@@ -34,5 +36,6 @@ export function getAppConfig(): AppConfig {
     includeRotated,
     journaldMaxLines,
     timezone,
+    archiveDir,
   };
 }

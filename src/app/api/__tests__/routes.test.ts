@@ -3,9 +3,11 @@ import os from "node:os";
 import path from "node:path";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { clearArchiveCache } from "@/lib/mail/archive";
 import { clearLogCache } from "@/lib/postfix/cache";
 import { GET as getHealth } from "../health/route";
 import { GET as getMessageDetail } from "../messages/[queueId]/route";
+import { GET as getMessageEmail } from "../messages/[queueId]/email/route";
 import { GET as getMessages } from "../messages/route";
 import { GET as getStats } from "../stats/route";
 import { GET as getStream } from "../stream/route";
@@ -15,6 +17,7 @@ describe("API Route Handlers (file mode)", () => {
   const prevPath = process.env.MAIL_LOG_PATH;
   const prevRotated = process.env.MAIL_LOG_INCLUDE_ROTATED;
   const prevTz = process.env.TZ;
+  const prevArchiveDir = process.env.MAIL_ARCHIVE_DIR;
   let tempDir = "";
 
   beforeEach(async () => {
@@ -28,6 +31,7 @@ describe("API Route Handlers (file mode)", () => {
     await fs.writeFile(
       logPath,
       [
+        `${ts} mail postfix/cleanup[1]: 4F3A001001A: message-id=<msg-1@example.com>`,
         `${ts} mail postfix/qmgr[1]: 4F3A001001A: from=<a@example.com>, size=1024, nrcpt=1 (queue active)`,
         `${ts} mail postfix/smtp[2]: 4F3A001001A: to=<u1@gmail.com>, relay=mx.google.com[1.2.3.4]:25, delay=0.9, delays=0.1/0/0.3/0.5, dsn=2.0.0, status=sent (250 OK)`,
         `${ts} mail postfix/qmgr[1]: 4F3A001002B: from=<b@example.com>, size=512, nrcpt=1 (queue active)`,
@@ -51,7 +55,9 @@ describe("API Route Handlers (file mode)", () => {
     process.env.MAIL_LOG_PATH = prevPath;
     process.env.MAIL_LOG_INCLUDE_ROTATED = prevRotated;
     process.env.TZ = prevTz;
+    process.env.MAIL_ARCHIVE_DIR = prevArchiveDir;
     clearLogCache();
+    clearArchiveCache();
     if (tempDir) {
       await fs.rm(tempDir, { recursive: true, force: true });
     }
@@ -141,5 +147,44 @@ describe("API Route Handlers (file mode)", () => {
       controller.abort();
       await reader.cancel();
     }
+  });
+
+  it("GET /api/messages/[queueId]/email returns not_configured or parsed email from archive", async () => {
+    delete process.env.MAIL_ARCHIVE_DIR;
+    const unconfRes = await getMessageEmail(
+      new NextRequest("http://localhost:3000/api/messages/4F3A001001A/email"),
+      { params: Promise.resolve({ queueId: "4F3A001001A" }) },
+    );
+    expect(unconfRes.status).toBe(200);
+    const unconfJson = await unconfRes.json();
+    expect(unconfJson).toEqual({ available: false, reason: "not_configured" });
+
+    const archiveDir = path.join(tempDir, "Maildir");
+    await fs.mkdir(path.join(archiveDir, "cur"), { recursive: true });
+    await fs.writeFile(
+      path.join(archiveDir, "cur", "1732786200.M1.mail:2,S"),
+      [
+        "From: Sender <a@example.com>",
+        "To: u1@gmail.com",
+        "Subject: Test Email Body",
+        "Message-ID: <msg-1@example.com>",
+        "Content-Type: text/html; charset=utf-8",
+        "",
+        "<p>Hello real email!</p>",
+      ].join("\r\n"),
+      "utf8",
+    );
+    process.env.MAIL_ARCHIVE_DIR = archiveDir;
+    clearArchiveCache();
+
+    const foundRes = await getMessageEmail(
+      new NextRequest("http://localhost:3000/api/messages/4F3A001001A/email"),
+      { params: Promise.resolve({ queueId: "4F3A001001A" }) },
+    );
+    expect(foundRes.status).toBe(200);
+    const foundJson = await foundRes.json();
+    expect(foundJson.available).toBe(true);
+    expect(foundJson.email.subject).toBe("Test Email Body");
+    expect(foundJson.email.sanitizedHtml).toContain("<p>Hello real email!</p>");
   });
 });
