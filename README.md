@@ -38,7 +38,7 @@ npm run build
 
 ## Ubuntu VPS Deployment (Hostinger + PM2 + Nginx)
 
-> **Security note**: This application intentionally has no built-in login or database. Keep Next.js bound to `127.0.0.1:3000` and restrict access at Nginx (IP allowlist / VPN / `auth_basic`) before exposing it on a public domain.
+> **Security note**: This application intentionally has no built-in login or database. Keep Next.js bound to `127.0.0.1:3099` and restrict access at Nginx (IP allowlist / VPN / `auth_basic`) before exposing it on a public domain.
 
 ### 1. Build the Application
 
